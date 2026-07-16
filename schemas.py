@@ -48,7 +48,7 @@ class TaskResponse(BaseModel):
     user_id: int
     completed: bool
     owner: Optional[UserResponse] = None
-    priority = int
+    priority: int
     
     class Config:
         from_attributes = True

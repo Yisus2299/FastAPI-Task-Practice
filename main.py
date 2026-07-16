@@ -3,7 +3,7 @@ from database import engine, Base
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from model import User
-from Router.tasks import router
+from Router import tasks, admin
 
 Base.metadata.create_all(bind=engine)
 
@@ -50,7 +50,8 @@ def integrity_exception_handler(request: Request, exc: IntegrityError):
 # create_user()
 
 
-app.include_router(router)
+app.include_router(tasks.router)
+app.include_router(admin.router)
 
 # main message just for testing:
 @app.get("/")
