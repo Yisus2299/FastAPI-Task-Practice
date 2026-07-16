@@ -33,13 +33,18 @@ def get_all_tasks_service(
     if id_max is not None:
         tasks = tasks.filter(Task.id <= id_max)
     
+
+    # Order priority by desc
+    tasks = tasks.order_by(Task.priority.desc())
+    
     if order == "desc":
         tasks = tasks.order_by(Task.id.desc())
-    else:
+    elif order == "asc":
         tasks = tasks.order_by(Task.id.asc())
     
     if limit is not None:
         tasks = tasks.limit(limit)
+
     
     return tasks.all()
 
@@ -60,10 +65,27 @@ def task_create_service(
     db:Session,
     user_id: int
     ) -> Task:
+    
+    # added Active Tasks:
+    active_tasks_count = db.query(Task).filter(
+    Task.user_id == user_id,
+    Task.completed == False
+    ).count()
+    
+    # Asign priority based on the number of active tasks
+    if active_tasks_count > 5:
+        priority = 3
+    elif active_tasks_count > 3:
+        priority = 2
+    else:
+        priority = 1
+ 
+    # create Task with the priority
     new_task = Task(
         title = task_create.title,
         description = task_create.description,
-        user_id = user_id
+        user_id = user_id,
+        priority = priority
     )
     db.add(new_task)
     db.commit()
